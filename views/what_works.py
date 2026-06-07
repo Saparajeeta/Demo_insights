@@ -32,6 +32,29 @@ def render(df, total_posts, total_profiles, global_avg_views):
     
     p1_block = "• Creator: @" + str(p1_data['username']) + " <br> • Views: " + f"{int(p1_data['views']):,}" + " <br> • Caption hook: *\"" + p1_hook + "\"* <br> • Link: [🔗 Verify Exact Post Evidence](" + str(p1_data['post_url']) + ")"
     st.markdown(f"**PROOF POST:** <br> {p1_block}", unsafe_allow_html=True)
+    
+    import os
+    username_str = str(p1_data['username'])
+    post_id_str = str(p1_data.name)
+    video_path = "data/videos/" + username_str + "_" + post_id_str + ".mp4"
+    with st.expander("🎬 Multimodal Asset Inspection"):
+        if os.path.exists(video_path):
+            st.video(video_path)
+        else:
+            post_url_str = str(p1_data['post_url'])
+            st.markdown("[🔗 Verify Exact Post Evidence](" + post_url_str + ")")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("**🔊 Verbal Script Delivery & Hook Pacing**")
+            st.info("Awaiting multimodal audio analysis...")
+        with col2:
+            st.markdown("**🖼️ Visual Hook Actions & On-Screen Text Patterns**")
+            st.info("Awaiting computer vision analysis...")
+        with col3:
+            st.markdown("**💡 Physical Body Language/Setting Strategy**")
+            st.info("Awaiting posture/setting extraction...")
+        
     st.markdown("**WHAT THIS MEANS FOR US:** Open your next 3 reels with a myth-bust hook before any recipe or tip content to build a save-heavy credibility base first.")
     st.markdown("---")
 
@@ -42,6 +65,28 @@ def render(df, total_posts, total_profiles, global_avg_views):
     
     p2_block = "• Creator: @" + str(p2_data['username']) + " <br> • Views: " + f"{int(p2_data['views']):,}" + " <br> • Caption hook: *\"" + p2_hook + "\"* <br> • Link: [🔗 Verify Exact Post Evidence](" + str(p2_data['post_url']) + ")"
     st.markdown(f"**PROOF POST:** <br> {p2_block}", unsafe_allow_html=True)
+
+    username_str_2 = str(p2_data['username'])
+    post_id_str_2 = str(p2_data.name)
+    video_path_2 = "data/videos/" + username_str_2 + "_" + post_id_str_2 + ".mp4"
+    with st.expander("🎬 Multimodal Asset Inspection"):
+        if os.path.exists(video_path_2):
+            st.video(video_path_2)
+        else:
+            post_url_str_2 = str(p2_data['post_url'])
+            st.markdown("[🔗 Verify Exact Post Evidence](" + post_url_str_2 + ")")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("**🔊 Verbal Script Delivery & Hook Pacing**")
+            st.info("Awaiting multimodal audio analysis...")
+        with col2:
+            st.markdown("**🖼️ Visual Hook Actions & On-Screen Text Patterns**")
+            st.info("Awaiting computer vision analysis...")
+        with col3:
+            st.markdown("**💡 Physical Body Language/Setting Strategy**")
+            st.info("Awaiting posture/setting extraction...")
+
     st.markdown("**WHAT THIS MEANS FOR US:** Deploy ManyChat backend automations immediately and configure a strict keyword-comment asset deployment sequence across all active layouts.")
     st.markdown("---")
 
@@ -52,6 +97,28 @@ def render(df, total_posts, total_profiles, global_avg_views):
     
     p3_block = "• Creator: @" + str(p3_data['username']) + " <br> • Views: " + f"{int(p3_data['views']):,}" + " <br> • Caption hook: *\"" + p3_hook + "\"* <br> • Link: [🔗 Verify Exact Post Evidence](" + str(p3_data['post_url']) + ")"
     st.markdown(f"**PROOF POST:** <br> {p3_block}", unsafe_allow_html=True)
+
+    username_str_3 = str(p3_data['username'])
+    post_id_str_3 = str(p3_data.name)
+    video_path_3 = "data/videos/" + username_str_3 + "_" + post_id_str_3 + ".mp4"
+    with st.expander("🎬 Multimodal Asset Inspection"):
+        if os.path.exists(video_path_3):
+            st.video(video_path_3)
+        else:
+            post_url_str_3 = str(p3_data['post_url'])
+            st.markdown("[🔗 Verify Exact Post Evidence](" + post_url_str_3 + ")")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("**🔊 Verbal Script Delivery & Hook Pacing**")
+            st.info("Awaiting multimodal audio analysis...")
+        with col2:
+            st.markdown("**🖼️ Visual Hook Actions & On-Screen Text Patterns**")
+            st.info("Awaiting computer vision analysis...")
+        with col3:
+            st.markdown("**💡 Physical Body Language/Setting Strategy**")
+            st.info("Awaiting posture/setting extraction...")
+
     st.markdown("**WHAT THIS MEANS FOR US:** Append a standard three-second positioning string anchoring our corporate coaching offer prior to the final CTA parameters on all reach assets.")
     st.markdown("---")
 
@@ -62,6 +129,28 @@ def render(df, total_posts, total_profiles, global_avg_views):
     
     p4_block = "• Creator: @" + str(p4_data['username']) + " <br> • Views: " + f"{int(p4_data['views']):,}" + " <br> • Caption hook: *\"" + p4_hook + "\"* <br> • Link: [🔗 Verify Exact Post Evidence](" + str(p4_data['post_url']) + ")"
     st.markdown(f"**PROOF POST:** <br> {p4_block}", unsafe_allow_html=True)
+
+    username_str_4 = str(p4_data['username'])
+    post_id_str_4 = str(p4_data.name)
+    video_path_4 = "data/videos/" + username_str_4 + "_" + post_id_str_4 + ".mp4"
+    with st.expander("🎬 Multimodal Asset Inspection"):
+        if os.path.exists(video_path_4):
+            st.video(video_path_4)
+        else:
+            post_url_str_4 = str(p4_data['post_url'])
+            st.markdown("[🔗 Verify Exact Post Evidence](" + post_url_str_4 + ")")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("**🔊 Verbal Script Delivery & Hook Pacing**")
+            st.info("Awaiting multimodal audio analysis...")
+        with col2:
+            st.markdown("**🖼️ Visual Hook Actions & On-Screen Text Patterns**")
+            st.info("Awaiting computer vision analysis...")
+        with col3:
+            st.markdown("**💡 Physical Body Language/Setting Strategy**")
+            st.info("Awaiting posture/setting extraction...")
+
     st.markdown("**WHAT THIS MEANS FOR US:** Coordinate our weekly production schedules around structural myth-bust frameworks to manipulate platform discoverability distribution rules dynamically.")
     st.markdown("---")
 
@@ -72,4 +161,26 @@ def render(df, total_posts, total_profiles, global_avg_views):
     
     p5_block = "• Creator: @" + str(p5_data['username']) + " <br> • Views: " + f"{int(p5_data['views']):,}" + " <br> • Caption hook: *\"" + p5_hook + "\"* <br> • Link: [🔗 Verify Exact Post Evidence](" + str(p5_data['post_url']) + ")"
     st.markdown(f"**PROOF POST:** <br> {p5_block}", unsafe_allow_html=True)
+
+    username_str_5 = str(p5_data['username'])
+    post_id_str_5 = str(p5_data.name)
+    video_path_5 = "data/videos/" + username_str_5 + "_" + post_id_str_5 + ".mp4"
+    with st.expander("🎬 Multimodal Asset Inspection"):
+        if os.path.exists(video_path_5):
+            st.video(video_path_5)
+        else:
+            post_url_str_5 = str(p5_data['post_url'])
+            st.markdown("[🔗 Verify Exact Post Evidence](" + post_url_str_5 + ")")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("**🔊 Verbal Script Delivery & Hook Pacing**")
+            st.info("Awaiting multimodal audio analysis...")
+        with col2:
+            st.markdown("**🖼️ Visual Hook Actions & On-Screen Text Patterns**")
+            st.info("Awaiting computer vision analysis...")
+        with col3:
+            st.markdown("**💡 Physical Body Language/Setting Strategy**")
+            st.info("Awaiting posture/setting extraction...")
+
     st.markdown("**WHAT THIS MEANS FOR US:** Introduce weekend monitoring system tracking frameworks to capture high-ticket executive buyers seeking structural execution assets over standard diet tips.")

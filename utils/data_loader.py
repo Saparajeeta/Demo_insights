@@ -9,6 +9,14 @@ def load_and_clean_data():
         st.error("Missing 'data/classified_insights.csv'. Please run your ingestion/classification scripts first!")
         st.stop()
 
+    # Attempt to merge real post_urls from raw_top_posts if it exists
+    try:
+        raw_df = pd.read_csv("data/raw_top_posts.csv")
+        raw_urls = raw_df[['username', 'caption', 'post_url']].drop_duplicates(subset=['username', 'caption'])
+        df = df.merge(raw_urls, on=['username', 'caption'], how='left')
+    except FileNotFoundError:
+        pass
+
     if "pillar" not in df.columns:
         df["pillar"] = df["category"].str.lower().str.replace(" ", "_") if "category" in df.columns else "viral_reach"
 
@@ -44,12 +52,15 @@ def load_and_clean_data():
         if "/p/" in url or "/reel/" in url:
             return url
             
-        # If it's missing or generic, build Google search link
+        # If it's missing or generic, build Instagram native link
         if not url or url == "nan" or url.strip() in ["https://instagram.com", "https://instagram.com/"]:
             if username and username != "nan" and username != "N/A":
                 hook_text = caption[:30]
-                cleaned_hook = re.sub(r'[^a-zA-Z0-9\s]', '', hook_text).strip().replace(' ', '+')
-                search_url = "https://www.google.com/search?q=site:instagram.com+" + username + "+" + cleaned_hook
+                cleaned_hook_word = re.sub(r'[^a-zA-Z0-9]', '', hook_text)
+                if cleaned_hook_word:
+                    search_url = f"https://www.instagram.com/explore/tags/{cleaned_hook_word}/"
+                else:
+                    search_url = f"https://www.instagram.com/{username}/reels/"
                 return search_url
             return "https://instagram.com"
             

@@ -1,5 +1,6 @@
 import streamlit as st
-
+import os
+from scripts.video_analyzer import analyze_organic_video_asset
 def render(df, global_avg_views):
     st.title("🔍 Advanced Competitor System Audit")
     st.subheader("Top 25 Market Leaders: Extracting Direct Copywriting Mechanics and Steal Scores")
@@ -82,3 +83,34 @@ def render(df, global_avg_views):
                 post_url_str = str(row["post_url"])
                 st.markdown("[🔗 Verify Exact Post Evidence](" + post_url_str + ")")
             st.text_area("Scraped Inbound Caption Text", value=row["caption"], height=100, key="deep_" + str(idx))
+            
+            import os
+            username_str = str(row['username'])
+            post_id_str = str(idx)
+            video_path = "data/videos/" + username_str + "_" + post_id_str + ".mp4"
+            with st.expander("🎬 Multimodal Asset Inspection"):
+                if os.path.exists(video_path):
+                    st.video(video_path)
+                    
+                    if st.button("🚀 Execute Live AI Multimodal Audit", key=f"run_ai_{idx}"):
+                        with st.spinner("Analyzing audio frequencies and visual frames via Gemini 2.5 Flash..."):
+                            analysis_results = analyze_organic_video_asset(video_path)
+                            st.session_state[f"cached_analysis_{idx}"] = analysis_results
+                    
+                    cached = st.session_state.get(f"cached_analysis_{idx}", None)
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.markdown("**🔊 Verbal Script Delivery & Hook Pacing**")
+                        st.info(cached["verbal"] if cached else "Awaiting dynamic script extraction trigger...")
+                    with col2:
+                        st.markdown("**🖼️ Visual Hook Actions & On-Screen Text Patterns**")
+                        st.info(cached["visual"] if cached else "Awaiting computer vision frame analysis...")
+                    with col3:
+                        st.markdown("**💡 Physical Body Language/Setting Strategy**")
+                        st.info(cached["physical"] if cached else "Awaiting environmental context extraction...")
+                else:
+                    st.warning(f"Media asset file '{username_str}_{post_id_str}.mp4' is not currently cached inside data/videos/.")
+                    if str(row["post_url"]) != "nan":
+                        post_url_str = str(row["post_url"])
+                        st.markdown(f"[🔗 Verify and View Asset Directly on Native Instagram Platform]({post_url_str})")
