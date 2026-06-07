@@ -6,39 +6,57 @@ def render(df, global_avg_views, global_avg_comments):
     st.subheader("Data-Backed Growth Projections Anchored Explicitly to Live Database Benchmarks")
     st.markdown("---")
     
-    base_conversion = 0.03
+    st.sidebar.markdown("### ⚙️ Simulation Controls")
+    conversion_rate = st.sidebar.slider("Assumed Lead Conversion Rate (%)", 0.1, 5.0, 1.0, step=0.1) / 100.0
     
-    st.markdown("### 📈 Data-Driven Growth Projection Scenarios")
-    st.markdown("The values below display projected outcomes for 12 planned video assets deployed over our initial 30 days based on active tracking averages:")
+    st.markdown("### 📈 Interactive 30-Day Acquisition Simulation")
+    st.markdown("Projected consultation bookings generated over the initial 30-day sprint across three deployment methodologies.")
     
-    forecast_data = {
-        "Funnel Metrics Layer": [
-            "Phase 1: Expected Saves per Asset (Days 1-10)", 
-            "Phase 2: Expected Views per Asset (Days 11-20)", 
-            "Phase 3: Inbound Lead Comments per CTA (Days 21-30)",
-            "Projected Total High-Intent Consultation Bookings"
-        ],
-        "Conservative Scenario": [
-            f"{int(global_avg_comments * 0.4)} saves", 
-            f"{int(global_avg_views * 0.5):,} views", 
-            f"{int(global_avg_comments * 0.6)} leads", 
-            f"{max(int(global_avg_comments * 12 * base_conversion * 0.5), 1)} bookings"
-        ],
-        "Realistic Baseline": [
-            f"{int(global_avg_comments * 0.8)} saves", 
-            f"{global_avg_views:,} views", 
-            f"{global_avg_comments} leads", 
-            f"{max(int(global_avg_comments * 12 * base_conversion), 2)} bookings"
-        ],
-        "Optimistic Target": [
-            f"{int(global_avg_comments * 1.5)} saves", 
-            f"{int(global_avg_views * 1.8):,} views", 
-            f"{int(global_avg_comments * 2.1)} leads", 
-            f"{int(global_avg_comments * 12 * base_conversion * 2.5)} bookings"
-        ]
-    }
-    st.table(pd.DataFrame(forecast_data).set_index("Funnel Metrics Layer"))
-    st.caption("**Methodological Note:** Consultation targets project a strict 3% application closing rate exclusively against inbound message threads initiated natively through comment triggers.")
+    days = list(range(1, 31))
+    
+    baseline_leads = []
+    optimized_leads = []
+    aggressive_leads = []
+    
+    b_acc, o_acc, a_acc = 0, 0, 0
+    for day in days:
+        # Simulate daily lead gen based on global avg comments and conversion rate
+        daily_base = global_avg_comments * 0.5 * conversion_rate
+        daily_opt = global_avg_comments * 0.8 * conversion_rate * (1 + (day/30))
+        daily_agg = global_avg_comments * 1.5 * conversion_rate * (1 + (day/15))
+        
+        b_acc += daily_base
+        o_acc += daily_opt
+        a_acc += daily_agg
+        
+        baseline_leads.append(int(b_acc))
+        optimized_leads.append(int(o_acc))
+        aggressive_leads.append(int(a_acc))
+        
+    sim_df = pd.DataFrame({
+        "Day": days,
+        "Baseline Growth": baseline_leads,
+        "Optimized Core Strategy (4:4:2 Mix)": optimized_leads,
+        "Aggressive Acquisition Velocity": aggressive_leads
+    }).set_index("Day")
+    
+    st.line_chart(sim_df)
+    
+    st.markdown("#### 📊 30-Day Projected Booking Yields")
+    c_m1, c_m2, c_m3 = st.columns(3)
+    
+    base_final = f"{baseline_leads[-1]:,}"
+    opt_final = f"{optimized_leads[-1]:,}"
+    agg_final = f"{aggressive_leads[-1]:,}"
+    
+    with c_m1:
+        st.metric(label="Baseline Expected", value=base_final)
+    with c_m2:
+        st.metric(label="Optimized Core (4:4:2)", value=opt_final)
+    with c_m3:
+        st.metric(label="Aggressive Velocity", value=agg_final)
+        
+    st.caption("**Methodological Note:** Consultation targets project actively against the sidebar slider closing rate exclusively tracking inbound message threads initiated natively through comment triggers.")
     st.markdown("---")
 
     p_col1, p_col2, p_col3 = st.columns(3)

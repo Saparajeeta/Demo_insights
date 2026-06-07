@@ -2,20 +2,18 @@
 
 An enterprise-grade social media data diagnostic platform built to reverse-engineer competitor customer acquisition funnels. This system processes raw public metrics (views, comments, captions) and synthesizes them into actionable, high-ticket organic content playbooks. 
 
-We recently pivoted the engine to strictly audit the **Top 25 Market Leaders** to isolate true alpha signals and eliminate market noise. The engine dynamically audits peak-performing posts for core copywriting triggers such as High-Value Credibility Anchoring, Low-Friction Conversion Capture, and Explicit Identity Bridging.
+We recently pivoted the engine to strictly audit the **Top 25 Market Leaders** to isolate true signals and eliminate market noise. The engine dynamically audits peak-performing posts for core copywriting triggers such as High-Value Credibility Anchoring, Low-Friction Conversion Capture, and Explicit Identity Bridging.
 
 ## 🚀 Features
 
-- **Automated Data Ingestion**: Scrapes the highest-performing assets from target competitor profiles using the Apify cloud infrastructure.
-- **Top 25 Market Leader Pivot**: Filters datasets down to the absolute top 25 accounts based on cumulative view velocity.
-- **Alpha Post Pattern Auditing**: Uses Google Gemini API to analyze the structural mechanics of top posts (Hooks, CTAs, conversion mechanics).
-- **Executive Control Dashboard**: A modular Streamlit application providing 5 distinct strategic lenses:
-  1. Macro Market Acquisition Analytics
-  2. Competitor System Audit
-  3. Validated Inbound Funnel Patterns
-  4. 30-Day Go-To-Market Growth Forecast
-  5. Under-Served Market Gaps & Failure Modes
-- **Smart Link Routing**: Dynamically maps insights back to the original source posts via deep links or engineered Google Search verification queries.
+- **Automated Video Ingestion Pipeline**: Scrapes high-performing `.mp4` video assets directly from Instagram using `yt-dlp` with automated cookie-based authentication bypass.
+- **Live AI Multimodal Video Auditing**: Uses the Google Gemini 2.5 Flash API to analyze video files frame-by-frame, extracting verbal hook pacing, visual text pop-ups, and physical setting strategies.
+- **Signature Performance Benchmarks**: Highlights elite-tier content patterns instead of generic market averages.
+- **Dynamic Executive Dashboards**: Fully interactive Streamlit UI featuring:
+  - Live Reach vs. Conversion Leak Gap calculations.
+  - Interactive 30-Day Go-To-Market Growth Forecast with adjustable conversion sliders and projected booking yields.
+  - Failure Mode Distribution Analysis with bar charts and interactive under-performer dataframes.
+- **Secure File Lockdown**: Automated `backup_manager.py` that securely archives downloaded media assets to prevent accidental overwrites or data loss.
 
 ## 📂 Project Structure
 
@@ -23,27 +21,31 @@ We recently pivoted the engine to strictly audit the **Top 25 Market Leaders** t
 fat_loss_insights/
 ├── app.py                      # Main entry point for the Streamlit dashboard
 ├── requirements.txt            # Python dependencies
+├── cookies.txt                 # Browser cookies for authenticating video downloads
 │
-├── data/                       # Datasets
-│   ├── profiles.csv            # Target competitor handles
-│   ├── raw_top_posts.csv       # Scraped raw metrics
-│   └── classified_insights.csv # AI-processed final intelligence sheet
+├── data/                       # Datasets & Media
+│   ├── classified_insights.csv # AI-processed final intelligence sheet
+│   └── videos/                 # Local cache of downloaded Instagram .mp4 files
+│
+├── system_backups/             # Secure .zip archives of downloaded video assets
 │
 ├── scripts/                    # Automation & processing scripts
-│   ├── generate_profiles.py    # Generates initial target profile database
-│   ├── data_ingestion.py       # Scrapes Instagram data via Apify
-│   └── ai_classifier.py        # Audits captions using Google Gemini 
+│   ├── data_ingestion.py       # Scrapes Instagram metadata
+│   ├── ai_classifier.py        # Audits captions using Google Gemini 
+│   ├── video_downloader.py     # Downloads .mp4 media assets using yt-dlp
+│   └── video_analyzer.py       # Live multimodal Gemini 2.5 Flash video audit engine
 │
 ├── utils/                      # Helper modules
-│   └── data_loader.py          # Safely loads, cleans, and filters the Top 25 dataset
+│   ├── data_loader.py          # Loads, cleans, and filters the Top 25 dataset
+│   └── backup_manager.py       # Zips and freezes downloaded video assets
 │
 └── views/                      # Streamlit UI Components
     ├── __init__.py
-    ├── macro_market.py         
-    ├── competitor_deep_dive.py 
-    ├── what_works.py           
-    ├── go_to_market.py         
-    └── blind_spots.py          
+    ├── macro_market.py         # Visual pattern match rates and calculated funnels
+    ├── competitor_deep_dive.py # Deep dive with multimodal video inspector
+    ├── what_works.py           # Verification evidence matrix
+    ├── go_to_market.py         # Interactive 30-day projection modeling
+    └── blind_spots.py          # Execution error frequency charts
 ```
 
 ## ⚙️ Setup & Installation
@@ -66,31 +68,21 @@ APIFY_API_TOKEN=your_apify_key_here
 GEMINI_API_KEY=your_google_gemini_key_here
 ```
 
+### 4. Configure Authentication Cookies
+To download videos natively, export your active Instagram browser session cookies and save them as `cookies.txt` in the root directory.
+
 ## 🏃‍♂️ Running the Engine
 
 ### Option A: Run the Dashboard (UI Only)
-If you just want to explore the data using the pre-compiled `classified_insights.csv` dataset, you can launch the dashboard immediately:
+Launch the fully interactive Streamlit application to explore the data:
 ```bash
 streamlit run app.py
 ```
 *The dashboard will automatically open in your browser at `http://localhost:8501`.*
 
-### Option B: Run the Full Data Pipeline
-If you want to pull fresh data from Instagram and run the AI classification pipeline from scratch:
-
-1. **Generate target profiles**:
-   ```bash
-   python scripts/generate_profiles.py
-   ```
-2. **Scrape live market data** (Requires Apify key):
-   ```bash
-   python scripts/data_ingestion.py
-   ```
-3. **Run the AI Pattern Audit** (Requires Gemini key):
-   ```bash
-   python scripts/ai_classifier.py
-   ```
-4. **Launch the Dashboard**:
-   ```bash
-   streamlit run app.py
-   ```
+### Option B: Run the Media Ingestion Pipeline
+If you want to pull fresh video files directly from the Instagram API and lock them down:
+```bash
+python scripts/video_downloader.py
+```
+*Note: This script automatically calls `utils/backup_manager.py` upon completion to archive your assets safely.*

@@ -61,8 +61,8 @@ def render(df, global_avg_views):
         action_str = str(row['action'])
         expander_title = "📌 Asset: " + views_str + " Views | Strategy Action: " + action_str
         with st.expander(expander_title):
-            if row.get('is_alpha', False):
-                st.error("🔥 PEAK-VIEW ALPHA POST")
+            if row.get('is_signature_asset', False):
+                st.error("💎 SIGNATURE PERFORMANCE BENCHMARK")
                 patterns_str = ""
                 if row.get('pattern_1_credibility', False):
                     patterns_str += "✓ Pattern 1: High-Value Credibility Anchoring  \n"

@@ -74,25 +74,26 @@ def load_and_clean_data():
     
     df = df[df['username'].isin(top_25_users)].copy()
     
-    # Alpha Post Identification
-    alpha_indices = df.groupby('username')['views'].idxmax()
-    df['is_alpha'] = False
-    df.loc[alpha_indices, 'is_alpha'] = True
+    # Signature Asset Identification
+    sig_indices = df.groupby('username')['views'].idxmax()
+    df['is_signature_asset'] = False
+    df.loc[sig_indices, 'is_signature_asset'] = True
     
     # Pattern Audit
     df['pattern_1_credibility'] = False
     df['pattern_2_conversion'] = False
     df['pattern_3_identity'] = False
     
-    cred_keywords = ['myth', 'clinical', 'case study', 'science', 'research']
-    df.loc[df['is_alpha'], 'pattern_1_credibility'] = df.loc[df['is_alpha']].apply(
-        lambda row: 'credibility' in str(row['pillar']) or 'authority' in str(row['pillar']) or any(kw in str(row['caption']).lower() for kw in cred_keywords), axis=1
+    cred_keywords = ['myth', 'clinical', 'case study', 'science', 'research', 'study', 'fact', 'truth', 'why', 'how to', 'health']
+    df.loc[df['is_signature_asset'], 'pattern_1_credibility'] = df.loc[df['is_signature_asset']].apply(
+        lambda row: any(x in str(row['pillar']).lower() for x in ['credibility', 'authority', 'education']) or any(x in str(row.get('category', '')).lower() for x in ['credibility', 'authority', 'education']) or any(kw in str(row['caption']).lower() for kw in cred_keywords), axis=1
     )
     
-    df.loc[df['is_alpha'], 'pattern_2_conversion'] = df.loc[df['is_alpha'], 'caption'].str.contains(r'comment\s+\w+', case=False, na=False)
+    conv_regex = r'comment|dm|drop a|reply|type below'
+    df.loc[df['is_signature_asset'], 'pattern_2_conversion'] = df.loc[df['is_signature_asset'], 'caption'].str.contains(conv_regex, case=False, na=False)
     
-    identity_keywords = ['i help', 'i coach', 'my clients', 'i transform', 'my mission', 'we help']
-    df.loc[df['is_alpha'], 'pattern_3_identity'] = df.loc[df['is_alpha'], 'caption'].apply(
+    identity_keywords = ['i help', 'i coach', 'my clients', 'i transform', 'my mission', 'we help', 'my program', 'working with me', 'inside our academy', 'transforming']
+    df.loc[df['is_signature_asset'], 'pattern_3_identity'] = df.loc[df['is_signature_asset'], 'caption'].apply(
         lambda x: any(kw in str(x).lower() for kw in identity_keywords)
     )
 

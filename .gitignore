@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 .DS_Store
 .env
+data/videos/
+system_backups/
+*.mp4
+*.zip
+cookies.txt

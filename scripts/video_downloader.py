@@ -29,13 +29,13 @@ def download_top_pattern_videos():
                 
             print(f"Downloading media asset for @{username} via direct link...")
             
-            # ADVANCED EXTRACTOR FLAGS
+            # 🎯 UPDATED EXTRACTOR FLAGS USING LOCAL COOKIES.TXT
             ydl_opts = {
                 'outtmpl': target_path,
                 'format': 'mp4',
                 'quiet': False,
-                # This bypasses the bot wall by cloning your active desktop login state
-                'cookiesfrombrowser': ('chrome', None, None, None), 
+                # Points directly to the cookies.txt file you successfully placed in the root directory
+                'cookiefile': 'cookies.txt', 
                 'ignoreerrors': True
             }
             
@@ -45,6 +45,13 @@ def download_top_pattern_videos():
                 print(f"Success. Saved to: {target_path}")
             except Exception as e:
                 print(f"Extractor skipped asset path: {str(e)}")
+    # Execute automated backup to freeze assets
+    try:
+        from utils.backup_manager import backup_downloaded_videos
+        print("\nLocking down assets...")
+        backup_downloaded_videos()
+    except Exception as e:
+        print(f"Backup manager failed: {e}")
 
 if __name__ == "__main__":
     download_top_pattern_videos()

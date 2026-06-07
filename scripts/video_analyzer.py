@@ -1,4 +1,6 @@
 import os
+import time
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import streamlit as st
@@ -8,6 +10,9 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
     Uploads a local .mp4 file directly to Gemini 2.5 Flash 
     to extract visual hooks, script delivery pacing, and setting architectures.
     """
+    # Force Python to parse the root '.env' file to secure credentials locally
+    load_dotenv()
+    
     # 🔐 Verify that your API Key is active in your terminal environment
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -29,8 +34,16 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
         client = genai.Client(api_key=api_key)
         
         # Upload the video file using the Files API (handles large multimodal files cleanly)
-        st.info("⚡ Packaging and uploading media asset to Gemini cloud processing layer...")
+        print("⚡ Packaging and uploading media asset to Gemini cloud processing layer...")
         uploaded_video = client.files.upload(file=video_file_path)
+        
+        # Wait for the video to be fully processed by Google
+        while uploaded_video.state.name == "PROCESSING":
+            time.sleep(2)
+            uploaded_video = client.files.get(name=uploaded_video.name)
+            
+        if uploaded_video.state.name == "FAILED":
+            raise Exception("Video processing failed on Google's backend.")
         
         # Build a highly tactical structural prompt
         analysis_prompt = (
@@ -46,10 +59,23 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
         )
         
         # Execute using gemini-2.5-flash for rapid multimodal inference speeds
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=[uploaded_video, analysis_prompt]
-        )
+        response = None
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=[uploaded_video, analysis_prompt]
+                )
+                break
+            except Exception as e:
+                err_str = str(e)
+                if "503" in err_str or "UNAVAILABLE" in err_str:
+                    if attempt < 2:
+                        time.sleep(3)
+                        continue
+                    else:
+                        raise Exception("⚠️ Google's AI servers are currently experiencing extreme peak traffic. Please click the button to re-trigger the audit query in a moment.")
+                raise e
         
         # Clean up the cloud asset after processing to protect data hygiene
         client.files.delete(name=uploaded_video.name)
