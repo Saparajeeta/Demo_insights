@@ -1,5 +1,6 @@
 import os
 import time
+import re
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -13,7 +14,7 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
     # Force Python to parse the root '.env' file to secure credentials locally
     load_dotenv()
     
-    # 🔐 Verify that your API Key is active in your terminal environment
+    # Verify that your API Key is active in your terminal environment
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         return {
@@ -34,7 +35,7 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
         client = genai.Client(api_key=api_key)
         
         # Upload the video file using the Files API (handles large multimodal files cleanly)
-        print("⚡ Packaging and uploading media asset to Gemini cloud processing layer...")
+        print("Packaging and uploading media asset to processing layer...")
         uploaded_video = client.files.upload(file=video_file_path)
         
         # Wait for the video to be fully processed by Google
@@ -47,7 +48,7 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
         
         # Build a highly tactical structural prompt
         analysis_prompt = (
-            "You are an elite organic content copywriter and human behavior data analyst. "
+            "You are a content marketing strategist and data analyst. "
             "Examine this video frame-by-frame and audio track to extract these three specific layers:\n\n"
             "1. VERBAL SCRIPT DELIVERY & HOOK PACING: Transcribe the first 5 seconds exactly. Analyze the tone, "
             "vocal volume switches, and word velocity gaps.\n"
@@ -58,9 +59,10 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
             "Format your response cleanly with explicit headers for VERBAL:, VISUAL:, and PHYSICAL:."
         )
         
-        # Execute using gemini-2.5-flash for rapid multimodal inference speeds
+        # Execute using gemini-2.5-flash for video analysis
         response = None
-        for attempt in range(3):
+        max_retries = 5
+        for attempt in range(max_retries):
             try:
                 response = client.models.generate_content(
                     model='gemini-2.5-flash',
@@ -69,12 +71,12 @@ def analyze_organic_video_asset(video_file_path: str) -> dict:
                 break
             except Exception as e:
                 err_str = str(e)
-                if "503" in err_str or "UNAVAILABLE" in err_str:
-                    if attempt < 2:
-                        time.sleep(3)
+                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                    if attempt < max_retries - 1:
+                        time.sleep(2 ** attempt + 2)  # Exponential backoff: 3s, 4s, 6s, 10s
                         continue
                     else:
-                        raise Exception("⚠️ Google's AI servers are currently experiencing extreme peak traffic. Please click the button to re-trigger the audit query in a moment.")
+                        raise Exception("API servers are experiencing heavy traffic or rate limits. Please click the button to re-trigger the analysis in a moment.")
                 raise e
         
         # Clean up the cloud asset after processing to protect data hygiene
@@ -95,18 +97,50 @@ def parse_gemini_output(text: str) -> dict:
     """Helper utility to segment text layout into separate dictionary items safely."""
     data = {"verbal": "Extraction pending", "visual": "Extraction pending", "physical": "Extraction pending"}
     
-    parts = text.split("VERBAL:")
-    if len(parts) > 1:
-        sub_parts = parts[1].split("VISUAL:")
-        data["verbal"] = sub_parts[0].strip()
-        if len(sub_parts) > 1:
-            phys_parts = sub_parts[1].split("PHYSICAL:")
-            data["visual"] = phys_parts[0].strip()
-            if len(phys_parts) > 1:
-                data["physical"] = phys_parts[1].strip()
+    lines = text.split('\n')
+    current_section = None
+    
+    verbal_lines = []
+    visual_lines = []
+    physical_lines = []
+    
+    verbal_pattern = re.compile(r'^\s*[\*\#\-\d\.]*\s*(VERBAL|SCRIPT)', re.IGNORECASE)
+    visual_pattern = re.compile(r'^\s*[\*\#\-\d\.]*\s*(VISUAL|HOOK)', re.IGNORECASE)
+    physical_pattern = re.compile(r'^\s*[\*\#\-\d\.]*\s*(PHYSICAL|BODY|SETTING)', re.IGNORECASE)
+    
+    for line in lines:
+        if verbal_pattern.match(line):
+            current_section = "verbal"
+            continue
+        elif visual_pattern.match(line):
+            current_section = "visual"
+            continue
+        elif physical_pattern.match(line):
+            current_section = "physical"
+            continue
+            
+        if current_section == "verbal":
+            verbal_lines.append(line)
+        elif current_section == "visual":
+            visual_lines.append(line)
+        elif current_section == "physical":
+            physical_lines.append(line)
+
+    if verbal_lines:
+        verbal_text = "\n".join(verbal_lines).strip()
+        if verbal_text:
+            data["verbal"] = verbal_text
+    if visual_lines:
+        visual_text = "\n".join(visual_lines).strip()
+        if visual_text:
+            data["visual"] = visual_text
+    if physical_lines:
+        physical_text = "\n".join(physical_lines).strip()
+        if physical_text:
+            data["physical"] = physical_text
                 
     # Fallback if text splitting is irregular
-    if data["verbal"] == "Extraction pending":
+    if data["verbal"] == "Extraction pending" and data["visual"] == "Extraction pending" and data["physical"] == "Extraction pending":
         data["verbal"] = text
         
     return data

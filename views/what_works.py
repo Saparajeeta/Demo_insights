@@ -3,10 +3,34 @@ import streamlit as st
 import pandas as pd
 from scripts.video_analyzer import analyze_organic_video_asset
 
+def calculate_confidence(df, filter_condition, pattern_name):
+    """
+    filter_condition: a boolean Series filtering df
+    Returns a dict with real sample size and confidence level
+    """
+    matching_posts = df[filter_condition]
+    post_count = len(matching_posts)
+    creator_count = matching_posts["username"].nunique()
+    
+    # Confidence logic based on real numbers
+    if post_count >= 20 and creator_count >= 8:
+        confidence = "🟢 HIGH"
+    elif post_count >= 8 and creator_count >= 3:
+        confidence = "🟡 MEDIUM"
+    else:
+        confidence = "🔴 LOW"
+    
+    return {
+        "confidence": confidence,
+        "post_count": post_count,
+        "creator_count": creator_count,
+        "badge": f"{confidence} CONFIDENCE — {post_count} posts, {creator_count} unique creators"
+    }
+
 def render_multi_proof_panel(pattern_df, pattern_id):
     with st.container():
-        st.markdown("### 📊 Verified Market Evidence Matrix (Top Creator Proofs)")
-        for idx, row in pattern_df.iterrows():
+        st.markdown("### Verified Market Evidence Matrix")
+        for loop_idx, (idx, row) in enumerate(pattern_df.iterrows()):
             creator_str = str(row['username'])
             views_str = f"{int(row['views']):,}"
             
@@ -21,45 +45,48 @@ def render_multi_proof_panel(pattern_df, pattern_id):
             st.markdown("**Performance:** " + views_str + " Views | " + comments_str + " Comments")
             st.markdown("**Hook Caption:** \"" + hook_str + "\"")
             
-            st.markdown("**Verification:** [🔗 Verify Exact Post Evidence](" + url_str + ")")
+            st.markdown("**Verification:** [View Original Post](" + url_str + ")")
             
             post_id_str = str(idx)
             video_path = "data/videos/" + creator_str + "_" + post_id_str + ".mp4"
-            with st.expander("🎬 Multimodal Asset Inspection"):
+            with st.expander("Video Content Analysis"):
                 if os.path.exists(video_path):
                     st.video(video_path)
                     
-                    if st.button("🚀 Execute Live AI Multimodal Audit", key="run_ai_ww_" + str(pattern_id) + "_" + str(idx)):
-                        with st.spinner("Analyzing audio frequencies and visual frames via Gemini 2.5 Flash..."):
-                            analysis_results = analyze_organic_video_asset(video_path)
-                            st.session_state["cached_analysis_ww_" + str(idx)] = analysis_results
+                    unique_btn_key = f"run_ai_ww_pat_{pattern_id}_loop_{loop_idx}_row_{idx}_{creator_str}"
+                    cache_key = f"cached_analysis_ww_loop_{loop_idx}_row_{idx}_{creator_str}"
                     
-                    cached = st.session_state.get("cached_analysis_ww_" + str(idx), None)
+                    if st.button("Run Video Analysis", key=unique_btn_key):
+                        with st.spinner("Analyzing audio frequencies and visual frames..."):
+                            analysis_results = analyze_organic_video_asset(video_path)
+                            st.session_state[cache_key] = analysis_results
+                    
+                    cached = st.session_state.get(cache_key, None)
                     
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.markdown("**🔊 Verbal Script Delivery & Hook Pacing**")
-                        st.info(cached["verbal"] if cached else "Awaiting dynamic script extraction trigger...")
+                        st.markdown("**Verbal Script Delivery & Hook Pacing**")
+                        st.info(cached["verbal"] if cached else "Awaiting analysis trigger...")
                     with col2:
-                        st.markdown("**🖼️ Visual Hook Actions & On-Screen Text Patterns**")
-                        st.info(cached["visual"] if cached else "Awaiting computer vision frame analysis...")
+                        st.markdown("**Visual Hook Actions & On-Screen Text**")
+                        st.info(cached["visual"] if cached else "Awaiting analysis trigger...")
                     with col3:
-                        st.markdown("**💡 Physical Body Language/Setting Strategy**")
-                        st.info(cached["physical"] if cached else "Awaiting environmental context extraction...")
+                        st.markdown("**Physical Body Language & Setting Strategy**")
+                        st.info(cached["physical"] if cached else "Awaiting analysis trigger...")
                 else:
-                    st.warning("💡 Asset cached on server — Click the platform verification link below to inspect live content.")
+                    st.warning("Video asset not cached locally.")
                     if url_str != "nan":
-                        st.markdown("[🔗 Verify and View Asset Directly on Native Instagram Platform](" + url_str + ")")
+                        st.markdown("[View Video on Instagram](" + url_str + ")")
 
 def render(df, total_posts, total_profiles, global_avg_views):
-    st.title("📈 Consulting Report: What Actually Works")
-    st.subheader("5 Validated Inbound Funnel Patterns Extracted Via Live Database Audits")
+    st.title("Proven Content Strategies")
+    st.subheader("Top 5 Performing Content Patterns Extracted from Top Creators")
     
-    st.markdown("### 📢 Systems Overview & Purpose Summary")
+    st.markdown("### Executive Summary")
     
     total_posts_str = str(total_posts)
     total_profiles_str = str(total_profiles)
-    intro_str = "Welcome to the Inbound Intelligence Engine Playbook. This reporting module functions as an automated strategic diagnostic platform built to solve a critical growth friction for our fat loss coaching brand: cutting through superficial metrics to isolate verified consumer conversion patterns. By executing programmatic queries across " + total_posts_str + " high-value asset records from " + total_profiles_str + " target competitor profiles, the interface strips away empty aesthetic noise to reverse-engineer exactly what copywriting frameworks, sequencing day gaps, and call-to-action keys trigger direct client decisions."
+    intro_str = "This report details proven content strategies based on " + total_posts_str + " high-performing posts from the top " + total_profiles_str + " market leaders. By analyzing these specific posts, we have identified what messaging, frameworks, and call-to-actions consistently drive conversions, providing actionable patterns for our own brand."
     st.markdown(intro_str)
     st.markdown("---")
 
@@ -90,48 +117,58 @@ def render(df, total_posts, total_profiles, global_avg_views):
     p5_df = get_proofs(p5_mask, 4)
 
     # CARD 1
-    st.error("### 📊 PATTERN 1: THE WARM-UP SEQUENCE")
-    st.markdown("`🟢 HIGH CONFIDENCE — 34 posts, 14 unique creators` | **Caveat:** Untested for accounts under 1K followers; requires baseline engagement to initiate algorithmic push variables.")
-    st.markdown("**WHAT WE FOUND:** Creators who distribute credibility assets (clinical facts, case studies) 3 to 5 days before releasing a call-to-action generate a 4.2x higher conversion velocity than cold offers. The system registers an optimal **4-day average day gap** between warm-up assets and direct lead capture strings.")
+    p1_confidence = calculate_confidence(df, p1_mask, "Warm-up Sequence")
+    st.error("### PATTERN 1: Warm-Up Content Strategy")
+    st.markdown(f"`{p1_confidence['badge']}` | **Note:** Recommended for accounts with baseline audience engagement.")
+    st.markdown("**Key Finding:** Creators who distribute credibility assets (clinical facts, case studies) 3 to 5 days before a direct call-to-action generate higher conversion rates. We recommend an optimal **4-day gap** between educational content and direct lead capture.")
     
     render_multi_proof_panel(p1_df, 1)
         
-    st.markdown("**WHAT THIS MEANS FOR US:** Open your next 3 reels with a myth-bust hook before any recipe or tip content to build a save-heavy credibility base first.")
+    st.markdown("**Actionable Insight:** Begin with myth-busting or educational content to build authority before presenting a sales offer.")
     st.markdown("---")
 
     # CARD 2
-    st.success("### 📊 PATTERN 2: THE COMMENT KEYWORD TRAP")
-    st.markdown("`🟢 HIGH CONFIDENCE — 52 posts, 21 unique creators` | **Caveat:** Relies completely on an active, instantaneous automation tool background integration (e.g., ManyChat).")
-    st.markdown("**WHAT WE FOUND:** Lowering entry friction by substituting outbound bio links with internal native keyword triggers improves overall engagement depth by 230%. The specific key token **'COMMENT'** generates a massive conversation loop premium compared to standard DM prompts.")
+    p2_confidence = calculate_confidence(df, p2_mask, "Keyword Comment Trigger")
+    st.success("### PATTERN 2: Keyword Comment Trigger")
+    st.markdown(f"`{p2_confidence['badge']}` | **Note:** Requires backend automation integration (e.g., ManyChat).")
+    st.markdown("**Key Finding:** Utilizing keyword triggers in the comments (e.g., 'COMMENT [WORD]') drives significantly higher engagement depth compared to standard 'Link in Bio' prompts.")
     
     render_multi_proof_panel(p2_df, 2)
 
-    st.markdown("**WHAT THIS MEANS FOR US:** Deploy ManyChat backend automations immediately and configure a strict keyword-comment asset deployment sequence across all active layouts.")
+    st.markdown("**Actionable Insight:** Implement automated messaging tools and utilize keyword triggers to lower the friction for audience interaction.")
     st.markdown("---")
 
     # CARD 3
-    st.warning("### 📊 PATTERN 3: THE VIRAL BRIDGE")
-    st.markdown("`🟡 MEDIUM CONFIDENCE — 12 posts, 5 unique creators` | **Caveat:** High reliance on coach camera confidence and crisp verbal delivery pacing.")
-    st.markdown("**WHAT WE FOUND:** 73% of viral fitness assets (>1M views) produce broad exposure but zero business pipeline momentum. The remaining 27% that capture premium clients enforce a strict **Personal Identity Statement** directly at the 75% mark of the video runtime matrix.")
+    p3_confidence = calculate_confidence(df, p3_mask, "The Viral Bridge")
+    st.warning("### PATTERN 3: The Viral Bridge")
+    st.markdown(f"`{p3_confidence['badge']}` | **Note:** Requires strong on-camera presence.")
+    st.markdown("**Key Finding:** High-reach posts only convert when they include a clear Personal Identity Statement towards the end of the video, seamlessly transitioning views into trust.")
     
     render_multi_proof_panel(p3_df, 3)
 
-    st.markdown("**WHAT THIS MEANS FOR US:** Append a standard three-second positioning string anchoring our corporate coaching offer prior to the final CTA parameters on all reach assets.")
+    st.markdown("**Actionable Insight:** Ensure viral-focused content includes a brief, authoritative statement about your coaching value proposition before the call-to-action.")
     st.markdown("---")
 
     # CARD 4
-    st.info("### 📊 PATTERN 4: THE CREDIBILITY FORMAT SPLIT")
-    st.markdown("`🟢 HIGH CONFIDENCE — 41 posts, 18 unique creators` | **Caveat:** Demands actual scientific accuracy or absolute visual case-study transparency to prevent call-out comments.")
-    st.markdown("**WHAT WE FOUND:** Direct myth-busting copy variables trigger a 5x higher saves-to-views threshold velocity compared to simple transformation showcases across all scanned credibility profiles.")
+    p4_confidence = calculate_confidence(df, p4_mask, "Credibility Anchoring")
+    st.info("### PATTERN 4: Credibility Anchoring")
+    st.markdown(f"`{p4_confidence['badge']}` | **Note:** Demands accuracy to maintain trust.")
+    st.markdown("**Key Finding:** Direct myth-busting content leads to higher save rates and establishes stronger authority than standard transformation photos.")
     
     render_multi_proof_panel(p4_df, 4)
 
-    st.markdown("**WHAT THIS MEANS FOR US:** Coordinate our weekly production schedules around structural myth-bust frameworks to manipulate platform discoverability distribution rules dynamically.")
+    st.markdown("**Actionable Insight:** Prioritize analytical, myth-busting formats to increase content longevity and audience trust.")
     st.markdown("---")
 
     # CARD 5
-    st.markdown("### 🔮 PATTERN 5: THE UNTAPPED GAP")
-    st.markdown("`🔴 LOW CONFIDENCE — 4 posts, 3 unique creators` | **Caveat:** High strategic opportunity but lower baseline data proof points inside this specific historical sheet.")
+    p5_confidence = calculate_confidence(df, p5_mask, "Systems Compliance Audit")
+    st.markdown("### PATTERN 5: Systems Compliance Audit")
+    st.markdown(f"`{p5_confidence['badge']}` | **Note:** Low frequency but high strategic potential.")
+    st.markdown("**Key Finding:** Content focusing on 'systems' and 'audits' rather than simple diet tips is rare but captures a high-ticket, executive demographic.")
+    
+    render_multi_proof_panel(p5_df, 5)
+
+    st.markdown("**Actionable Insight:** Develop content frameworks that speak to structural execution and lifestyle systems to attract premium clients.")
     st.markdown("**WHAT WE FOUND:** The 'Systems Compliance Operational Audit' hook structure occurs fewer than 5 times across the entire 100-profile database, yet commands above-average view scores, isolating a massive open competitive advantage.")
     
     render_multi_proof_panel(p5_df, 5)

@@ -1,8 +1,8 @@
 import streamlit as st
 
 def render(df):
-    st.title("🎯 Macro Market Acquisition Analytics")
-    st.subheader("An Analytical Diagnostic of Top 25 Market Leaders Client Funnels")
+    st.title("Market Acquisition Overview")
+    st.subheader("Top 25 Market Leaders Funnel Analysis")
     st.markdown("---")
     
     # CALCULATIONS
@@ -54,32 +54,32 @@ def render(df):
         top_v_count = 0
         top_url = "https://instagram.com"
 
-    st.markdown("### 📊 Calculated Operational Framework Metrics")
+    st.markdown("### Key Performance Metrics")
     c1, c2 = st.columns(2)
     with c1:
-        st.metric(label="📉 Reach vs. Conversion Leak Gap", value=gap_percent_str)
-        st.caption("**Takeaway:** " + str(gap_percent) + "% of viral fitness reels generate vanity views but abandon lead attribution loops completely.")
+        st.metric(label="Reach vs. Conversion Drop-off", value=gap_percent_str)
+        st.caption("**Takeaway:** " + str(gap_percent) + "% of viral fitness content generates views but fails to capture leads.")
     with c2:
-        st.metric(label="💎 Credibility Content Comment ROI Premium", value=roi_val_str)
-        st.caption("**Takeaway:** Authority/credibility assets generate a **" + str(roi_val) + "x comment multiplier** over raw views.")
+        st.metric(label="Credibility Content ROI Premium", value=roi_val_str)
+        st.caption("**Takeaway:** Authority assets generate a **" + str(roi_val) + "x comment multiplier** over standard viral content.")
         
     st.markdown("---")
     c3, c4, c5 = st.columns(3)
     with c3:
-        st.metric(label="🧩 Winning Content Mix Ratio", value=mix_ratio_str)
-        st.caption("Normalized verified production pace matrix across top creators (Credibility : Viral : Lead-Gen).")
+        st.metric(label="Content Strategy Mix", value=mix_ratio_str)
+        st.caption("Distribution of content types across top creators (Credibility : Viral : Lead-Gen).")
     with c4:
-        st.metric(label="🔑 Highest Conversion Trigger Key", value=top_trigger_word.upper())
-        st.caption("The structural action word '" + top_trigger_word.upper() + "' consistently scales engagement depth over outbound links.")
+        st.metric(label="Primary Conversion Keyword", value=top_trigger_word.upper())
+        st.caption("The keyword '" + top_trigger_word.upper() + "' drives the highest engagement compared to outbound links.")
     with c5:
-        st.metric(label="🏆 Top Converting Benchmark Profile", value="@" + top_user)
+        st.metric(label="Top Converting Profile", value="@" + top_user)
         top_v_count_str = f"{top_v_count:,}"
-        metric_string = "**Views:** " + top_v_count_str + " <br> " + "[🔗 Verify Exact Post Evidence](" + top_url + ")"
+        metric_string = "**Views:** " + top_v_count_str + " <br> " + "[View Original Post](" + top_url + ")"
         st.markdown(metric_string, unsafe_allow_html=True)
         
     st.markdown("---")
-    st.markdown("### 📈 Visual Pattern Match Rate (Top 25 Leaders)")
-    st.markdown("Adoption rate of the 3 core inbound patterns across our elite dataset.")
+    st.markdown("### Pattern Match Rate (Top 25 Leaders)")
+    st.markdown("Adoption rate of the 3 core patterns across the dataset.")
     
     # Calculate pattern adoption rates
     sig_assets = df[df.get("is_signature_asset", False) == True] if "is_signature_asset" in df.columns else df

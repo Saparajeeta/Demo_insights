@@ -8,10 +8,12 @@ We recently pivoted the engine to strictly audit the **Top 25 Market Leaders** t
 
 - **Automated Video Ingestion Pipeline**: Scrapes high-performing `.mp4` video assets directly from Instagram using `yt-dlp` with automated cookie-based authentication bypass.
 - **Live AI Multimodal Video Auditing**: Uses the Google Gemini 2.5 Flash API to analyze video files frame-by-frame, extracting verbal hook pacing, visual text pop-ups, and physical setting strategies.
-- **Signature Performance Benchmarks**: Highlights elite-tier content patterns instead of generic market averages.
+- **Dynamic AI Text Analysis**: Fully automated hook structure extraction and pillar classification powered by Gemini, featuring multi-layer keyword fallbacks to ensure 100% data integrity.
+- **Signature Performance Benchmarks**: Highlights elite-tier content patterns with dynamically calculated confidence scores based on real-time dataset ratios.
 - **Dynamic Executive Dashboards**: Fully interactive Streamlit UI featuring:
   - Live Reach vs. Conversion Leak Gap calculations.
-  - Interactive 30-Day Go-To-Market Growth Forecast with adjustable conversion sliders and projected booking yields.
+  - Interactive 30-Day Go-To-Market Growth Forecast natively driven by phase-specific dataset averages and dynamically selected top CTAs.
+  - Live AI-driven Market Gaps Analysis finding unmet demand across the dataset.
   - Failure Mode Distribution Analysis with bar charts and interactive under-performer dataframes.
 - **Secure File Lockdown**: Automated `backup_manager.py` that securely archives downloaded media assets to prevent accidental overwrites or data loss.
 
